@@ -1,0 +1,10 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://services.intelgy.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ser:doTest>
+         <testInput>
+            <mensajefusesoap>${headers.id}</mensajefusesoap>
+         </testInput>
+      </ser:doTest>
+   </soapenv:Body>
+</soapenv:Envelope>

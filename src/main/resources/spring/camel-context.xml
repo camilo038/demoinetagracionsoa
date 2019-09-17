@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:cxf="http://camel.apache.org/schema/cxf"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        http://camel.apache.org/schema/spring        http://camel.apache.org/schema/spring/camel-spring.xsd  http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf-2.8.3.xsd">
+    <bean class="org.slf4j.LoggerFactory" factory-method="getLogger" id="rh1">
+        <constructor-arg index="0" value="rh1"/>
+    </bean>
+    <bean class="org.apache.camel.model.dataformat.JsonDataFormat" id="jsonDataformat">
+        <property name="unmarshalType" value="java.util.Map"/>
+        <property name="library" value="Jackson"/>
+    </bean>
+    <!--   <bean class="org.apache.commons.dbcp.BasicDataSource" -->
+    <!--         destroy-method="close" id="dataSource"> -->
+    <!--         <property name="driverClassName" value="org.postgresql.Driver"/> -->
+    <!--         <property name="url" value="${quickstart.url}"/> -->
+    <!--         <property name="username" value="${quickstart.recipients}"/> -->
+    <!--         <property name="password" value="wana1200"/> -->
+    <!--     </bean>	 -->
+    <cxf:cxfEndpoint address="/" endpointName="a:TestWebServiceImplPort"
+        id="CXFTest" serviceClass="com.intelgy.services.TestWebService"
+        serviceName="a:TestWebServiceImplService"
+        wsdlURL="/wsdl/validador.wsdl" xmlns:a="http://services.intelgy.com/"/>
+    <camelContext id="camel" streamCache="true" threadNamePattern="100" xmlns="http://camel.apache.org/schema/spring">
+        <threadPoolProfile defaultProfile="true" id="changedProfile"
+            maxQueueSize="100" poolSize="3"/>
+        <route id="simple-route">
+            <from id="route-timer" uri="timer://foo?period=30000"/>
+            <setHeader headerName="CamelHttpMethod" id="_setHeader1">
+                <constant>POST</constant>
+            </setHeader>
+            <!--             <marshal id="_marshal1"> -->
+            <!--                 <json library="Jackson"/> -->
+            <!--             </marshal> -->
+            <setBody id="_setBody1">
+                <simple>[ 
+   { 
+      "nit":"12"
+   }
+]</simple>
+            </setBody>
+           
+            <log id="_log1" loggerRef="rh1" loggingLevel="INFO" message="::::Respuesta Rest::::::${body}"/>
+            <setHeader headerName="id" id="_setHeader2">
+                <jsonpath suppressExceptions="true">$..nit</jsonpath>
+            </setHeader>
+            <to id="_to2" uri="direct:soapdemo"/>
+        </route>
+        <route id="_route1">
+            <from id="_from1" uri="direct:soapdemo"/>
+            <setHeader headerName="CamelHttpMethod" id="_setHeader3">
+                <constant>POST</constant>
+            </setHeader>
+            <to id="_to3" uri="velocity:template/formater.vm"/>
+            <to id="_to4" uri="http4://wdslclientepruebas-sopacliente.app.tecno.com/ws"/>
+            <log id="_log2" loggerRef="rh1" loggingLevel="INFO" message="::::Respuesta Soap::::::${body}"/>
+        </route>
+       
+    </camelContext>
+</beans>

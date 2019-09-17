@@ -1,0 +1,12 @@
+[
+  {
+    "album": "The White Stripes",
+    "year": 1999,
+    "US_peak_chart_post": "-"
+  },
+  {
+    "album": "De Stijl",
+    "year": 2000,
+    "US_peak_chart_post": ""
+  }
+]
